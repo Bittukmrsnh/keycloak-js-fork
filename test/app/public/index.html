@@ -8,17 +8,75 @@
     <script type="importmap">
       {
         "imports": {
-          "keycloak-js": "./keycloak.js"
+          "keycloak-js": "../../../lib/keycloak.js"
         }
       }
     </script>
-    <link rel="modulepreload" href="./keycloak.js">
+    <link rel="modulepreload" href="../../../lib/keycloak.js">
   </head>
   <body>
+    <h1>Application Portal</h1>
+    <button id="loginBtn">Login</button>
+    <ul id="appList"></ul>
+
     <script type="module">
-      // Expose Keycloak constructor globally so that the tests can access it.
-      import Keycloak from 'keycloak-js'
-      globalThis.Keycloak = Keycloak
+      import Keycloak from 'keycloak-js';
+
+      // --- Keycloak Configuration ---
+      // IMPORTANT: Replace these with your actual Keycloak server details
+      const keycloak = new Keycloak({
+        url: 'http://localhost:8080', // Your Keycloak server URL
+        realm: 'myrealm',             // Your realm name
+        clientId: 'my-app-client'     // Your client ID
+      });
+
+      const loginBtn = document.getElementById('loginBtn');
+      const appList = document.getElementById('appList');
+
+      async function initializeKeycloak() {
+        try {
+          const authenticated = await keycloak.init({ onLoad: 'check-sso' });
+          if (authenticated) {
+            console.log("User is authenticated");
+            loginBtn.textContent = 'Logout';
+            loginBtn.onclick = () => keycloak.logout();
+            loadApplications();
+          } else {
+            console.log("User is not authenticated");
+            loginBtn.textContent = 'Login';
+            loginBtn.onclick = () => keycloak.login();
+          }
+        } catch (error) {
+          console.error('Failed to initialize Keycloak', error);
+          alert('Could not connect to Keycloak. See console for details.');
+        }
+      }
+
+      async function loadApplications() {
+        try {
+          const response = await fetch('./applications.json');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const apps = await response.json();
+          
+          appList.innerHTML = ''; // Clear list
+          apps.forEach(app => {
+            const listItem = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = app.url;
+            link.textContent = app.name;
+            link.target = '_blank'; // Open in new tab
+            listItem.appendChild(link);
+            appList.appendChild(listItem);
+          });
+        } catch (error) {
+          console.error('Failed to load applications:', error);
+          appList.innerHTML = '<li>Error loading applications.</li>';
+        }
+      }
+
+      initializeKeycloak();
     </script>
   </body>
 </html>
