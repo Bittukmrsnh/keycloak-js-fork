@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "playwright test",
-    "app": "node --loader ts-node/esm app/app.ts"
+    "app": "node --import ts-node/esm app/app.ts"
   },
   "devDependencies": {
     "@keycloak/keycloak-admin-client": "^26.1.4",
