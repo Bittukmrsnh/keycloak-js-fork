@@ -27,6 +27,9 @@ app.use((req, res, next) => {
 
 // Expose 'public' directory and Keycloak JS source.
 app.use(express.static(path.resolve(__dirname, 'public')))
+app.use(express.static(path.resolve(__
+// Expose 'public' directory and Keycloak JS source.
+app.use(express.static(path.resolve(__dirname, 'public')))
 app.use(express.static(path.resolve(__dirname, '../../lib')))
 
 // Expose an endpoint to serve the Keycloak adapter configuration.
