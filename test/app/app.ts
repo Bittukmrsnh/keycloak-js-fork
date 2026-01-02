@@ -1,6 +1,9 @@
 import express from 'express'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url';
 import { AUTH_SERVER_URL, CLIENT_ID, REDIRECT_SERVICE_URL } from '../support/common.ts'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express()
 
@@ -23,8 +26,8 @@ app.use((req, res, next) => {
 })
 
 // Expose 'public' directory and Keycloak JS source.
-app.use(express.static(path.resolve(import.meta.dirname, 'public')))
-app.use(express.static(path.resolve(import.meta.dirname, '../../lib')))
+app.use(express.static(path.resolve(__dirname, 'public')))
+app.use(express.static(path.resolve(__dirname, '../../lib')))
 
 // Expose an endpoint to serve the Keycloak adapter configuration.
 app.get('/adapter-config.json', (req, res) => {
